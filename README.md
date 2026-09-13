@@ -13,6 +13,8 @@ Skills live in the `skills/` directory.
 
 ## impossible-states
 
+Simplify a codebase by making invalid states unrepresentable, carrying parsed types through every consumer, and removing redundant defenses. Reads the repository’s own coding standards and style guides before refactoring.
+
 ```sh
 npx skills add https://github.com/klaemo/skills --skill impossible-states
 ```
@@ -36,6 +38,8 @@ Add a scope after the skill name to focus on changes on the current branch, unco
 In Codex, use `$impossible-states` with the same instructions.
 
 ## remove-low-value-tests
+
+Remove unjustified tests, preserve behavioral coverage, and simplify production seams made obsolete by the cleanup.
 
 ```sh
 npx skills add https://github.com/klaemo/skills --skill remove-low-value-tests
