@@ -11,7 +11,7 @@ Skills live in the `skills/` directory.
 | [impossible-states](skills/impossible-states/SKILL.md) | Simplify a codebase by making invalid states unrepresentable, carrying parsed types through every consumer, and removing redundant defenses. Reads the repository's own coding standards and style guides before refactoring. |
 | [remove-low-value-tests](skills/remove-low-value-tests/SKILL.md) | Remove unjustified tests, preserve behavioral coverage, and simplify obsolete production seams. |
 
-## Impossible states
+## impossible-states
 
 Install the published version:
 
@@ -37,7 +37,7 @@ Add a scope after the skill name to focus on changes on the current branch, unco
 
 In Codex, use `$impossible-states` with the same instructions.
 
-## Remove low-value tests
+## remove-low-value-tests
 
 Install the published version:
 
