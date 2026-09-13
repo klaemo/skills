@@ -8,12 +8,12 @@ Skills live in the `skills/` directory.
 
 | Skill | Description |
 | --- | --- |
-| [impossible-states](skills/impossible-states/SKILL.md) | Simplify a codebase by making invalid states unrepresentable, carrying parsed types through every consumer, and removing redundant defenses. Reads the repository's own coding standards and style guides before refactoring. |
+| [impossible-states](skills/impossible-states/SKILL.md) | Simplify a codebase by making invalid states unrepresentable, carrying parsed types through every consumer, and removing redundant defenses. |
 | [remove-low-value-tests](skills/remove-low-value-tests/SKILL.md) | Remove unjustified tests, preserve behavioral coverage, and simplify obsolete production seams. |
 
 ## impossible-states
 
-Simplify a codebase by making invalid states unrepresentable, carrying parsed types through every consumer, and removing redundant defenses. Reads the repository’s own coding standards and style guides before refactoring.
+Simplify a codebase by making invalid states unrepresentable, carrying parsed types through every consumer, and removing redundant defenses.
 
 ```sh
 npx skills add https://github.com/klaemo/skills --skill impossible-states
@@ -36,6 +36,9 @@ Add a scope after the skill name to focus on changes on the current branch, unco
 ```
 
 In Codex, use `$impossible-states` with the same instructions.
+
+> [!TIP]
+> After running the skill, ask your agent to update your project's coding and testing guides based on what the skill discovered.
 
 ## remove-low-value-tests
 
