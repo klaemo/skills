@@ -13,10 +13,8 @@ Skills live in the `skills/` directory.
 
 ## impossible-states
 
-Install the published version:
-
 ```sh
-npx skills add https://github.com/klaemo/skills --skill impossible-states --agent claude-code codex
+npx skills add https://github.com/klaemo/skills --skill impossible-states
 ```
 
 This skill runs only when you explicitly invoke it:
@@ -39,10 +37,8 @@ In Codex, use `$impossible-states` with the same instructions.
 
 ## remove-low-value-tests
 
-Install the published version:
-
 ```sh
-npx skills add https://github.com/klaemo/skills --skill remove-low-value-tests --agent claude-code codex
+npx skills add https://github.com/klaemo/skills --skill remove-low-value-tests
 ```
 
 Invoke explicitly with `/remove-low-value-tests` in Claude Code or `$remove-low-value-tests` in Codex.
@@ -65,5 +61,5 @@ In Codex, use `$remove-low-value-tests` with the same instructions. Related code
 From the repository root, replace `<skill-name>` with any skill listed above:
 
 ```sh
-npx skills add . --skill <skill-name> --agent claude-code codex
+npx skills add . --skill <skill-name>
 ```
