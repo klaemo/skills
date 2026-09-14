@@ -50,7 +50,7 @@ npx skills add https://github.com/klaemo/skills --skill remove-low-value-tests
 
 Invoke explicitly with `/remove-low-value-tests` in Claude Code or `$remove-low-value-tests` in Codex.
 
-By default, it sweeps the full repository, removes or consolidates unjustified tests, rewrites brittle assertions, inspects production seams for justified simplification, and updates testing guidance from concrete findings. It reads applicable repository instructions and style guides, preserves distinct behavioral coverage, and reports a removal ledger and validation results. No deletion quota applies. Commits and PR publication require a request.
+By default, it sweeps the full repository, removes or consolidates unjustified tests, rewrites brittle assertions, inspects production seams for justified simplification, and reports testing-guidance proposals from concrete findings. It reads applicable repository instructions and style guides, preserves distinct behavioral coverage, and reports a removal ledger and validation results. No deletion quota applies. Guide updates, commits, and PR publication require a request.
 
 Use **audit only** for findings without file edits, **tests only** to restrict edits to tests and their support files, or name a directory or change scope. These options can be combined:
 
@@ -62,6 +62,9 @@ Use **audit only** for findings without file edits, **tests only** to restrict e
 ```
 
 In Codex, use `$remove-low-value-tests` with the same instructions. Related code may be read to understand contracts, while edits stay within the requested scope.
+
+> [!TIP]
+> After running the skill, ask your agent to update your project's coding and testing guides based on what the skill discovered.
 
 ## Install from a local checkout
 

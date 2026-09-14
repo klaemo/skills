@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Remove low-value tests
 
-Make tests justify their presence through observable regressions. By default, inspect the full repository, implement justified test cleanup, inspect resulting production simplifications, and update testing guidance from concrete findings. Counts summarize the result; they are never deletion targets. Finding no justified changes is a valid outcome.
+Make tests justify their presence through observable regressions. By default, inspect the full repository, implement justified test cleanup, inspect resulting production simplifications, and report testing-guidance proposals from concrete findings. Counts summarize the result; they are never deletion targets. Finding no justified changes is a valid outcome.
 
 Honor narrower requests: a directory, branch diff, uncommitted changes, tests only, or audit only. For audit only, investigate and report proposals without editing files. For tests only, limit edits to tests and their support files; report production and guidance proposals separately. Read related code outside the requested scope when needed to establish contracts, but keep edits within scope. Commit or publish a PR only when requested.
 
@@ -40,7 +40,7 @@ In edit mode, remove unjustified cases and orphaned fixtures. Consolidate useful
 
 Trace removed tests' imports into production and inspect remaining callers, exports, wrappers, injection points, and helpers. Check public consumers and dynamic/configured uses where applicable; a missing local import alone does not establish that an API is unused. Simplify only seams made obsolete by this cleanup with evidence that their real obligations remain satisfied. Record why retained seams are still needed when no simplification is justified.
 
-Update the discovered testing guidance with reusable lessons supported by findings, preserving the repository's boundary and integration rules. If no guide exists, choose a location consistent with its documentation conventions. Make guidance changes only within the requested edit scope.
+Propose reusable lessons for the discovered testing guidance, preserving the repository's boundary and integration rules. Editing repository guides is a separate action requiring applicable authorization. When authorized, update guidance within the requested edit scope; if no guide exists, choose a location consistent with its documentation conventions.
 
 Completion: authorized changes preserve each valuable scenario, every removal has a ledger entry, affected seams have a supported disposition, and guidance changes or proposals follow the findings. In audit mode, produce these as proposals only.
 
