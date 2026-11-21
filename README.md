@@ -124,7 +124,7 @@ Invoke with `/sol-review` in Claude Code or `$sol-review` in Codex, or ask for a
 /sol-review the changes on this branch compared with main, at max effort
 ```
 
-The reviewer runs on another provider: in T3 Code through its delegation tools, elsewhere through the harness's subagent tools. When GPT Sol cannot be reached, the skill reports that instead of using another model.
+The reviewer is started in T3 Code through its delegation tools, elsewhere through the harness's subagent tools. When the reviewer model cannot be reached, the skill reports that instead of using another model.
 
 ## proof
 
