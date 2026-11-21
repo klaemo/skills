@@ -12,13 +12,13 @@ Ask the user only when the goal is ambiguous in a way that changes the result, o
 
 ## 1. Restate the intent
 
-Write the intent in one or two lines: what changes, and what someone would observe once it works. Choose the mode: **orchestrated** when the work spans several tickets or the user asks to delegate (see [Orchestrated mode](#orchestrated-mode)), **single** otherwise.
+Write the intent in one or two lines: what changes, and what someone would observe once it works. Choose the mode: **orchestrated** when the work spans several tickets or the user asks to delegate, **single** otherwise. In orchestrated mode, read [`ORCHESTRATION.md`](ORCHESTRATION.md) and follow it in place of steps 2 to 5.
 
 Completion: the intent is stated and the mode chosen.
 
 ## 2. Implement
 
-Fetch, then create a branch from the latest default branch (or the base the user names) and do all work there; the default branch receives no commits from this run. Read the repository's instructions for conventions, checks, and PR practice. Make the smallest change that works: fix the case the request names, without speculative options or adjacent refactors.
+Work on a feature branch. When the checkout is already on one, as in a thread's own worktree, continue there and keep the work it holds. On the default branch, fetch and create a branch from its latest commit, or from the base the user names. The default branch receives no commits from this run. Read the repository's instructions for conventions, checks, and PR practice. Make the smallest change that works: fix the case the request names, without speculative options or adjacent refactors.
 
 Run the repository's checks and fix what the change breaks. Confirm any remaining failure is pre-existing by reproducing it on the base.
 
@@ -46,15 +46,6 @@ Push the branch and open the PR against its base, following the repository's PR 
 - the checks run and their results.
 
 Completion: the PR is open against the intended base and its body carries the proof and the ledger.
-
-## Orchestrated mode
-
-You become the **lead**: you split the work, delegate each part, and own the combined result.
-
-1. Split the intent into parts, one per ticket or independent unit, in dependency order. Completion: every piece of the intent belongs to exactly one part.
-2. Delegate each part to an implementer in its own checkout: in T3 Code, `delegate_task` with `role: "implementation"` and `isolation: "worktree"`; elsewhere, the harness's subagent tool with worktree isolation. The implementer gets no history, so its brief holds the overall intent, its part, its base branch, the absolute path of this file with the instruction to follow steps 2 to 5 (including `sol-review` and `proof`, which authorizes it to start the Sol reviewer), and a reply format: PR URL, head SHA, ledger, proof status. When an implementer's harness cannot start the reviewer, run `sol-review` on that part's branch yourself and add the ledger to its PR. A part that depends on another branches from that part's branch, and its PR targets it, forming a stack; use the repository's stack tooling when it documents one. Completion: every part has an implementer running.
-3. Check each implementer's reply as it arrives: the PR exists, its body carries proof and a ledger, its diff stays within its part. Send gaps back to that part. Completion: every part has an open PR that passes this check.
-4. Check the combined result against the original intent: read the combined diff (the top of a stack, or every PR together), and run the checks on it. Every piece of the intent is delivered, and no two parts overlap or contradict. Fix gaps in the owning part's PR. Completion: the combined result meets the intent.
 
 ## Report
 

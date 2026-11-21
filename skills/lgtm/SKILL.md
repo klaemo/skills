@@ -30,19 +30,19 @@ Completion: the remote head is the rebased, locally validated branch, and its SH
 
 ## 3. Babysit through merge
 
-Wait on checks for the current remote head with the harness's PR watcher when one exists (`watch_pull_request` in T3 Code), and otherwise with bounded polling and concise progress updates. Inspect failure logs, fix failures within scope, validate, and push. After every new commit or rebase, wait for checks on the new head; earlier green results do not carry over. Retry a transient infrastructure failure only when the evidence supports a retry. When the same failure persists after two remedies, or progress needs credentials, human review, or an out-of-scope change, report the concrete blocker.
+Wait on checks for the current remote head with the harness's PR watcher when one exists (`watch_pull_request` in T3 Code), and otherwise with bounded polling and concise progress updates. Inspect failure logs, fix failures within scope, validate, and push. After every new commit or rebase, wait for checks on the new head; earlier green results do not carry over. Retry a transient infrastructure failure only when the evidence supports a retry. When the same failure persists after two remedies, or progress needs credentials, human review, or an out-of-scope change, stop the watcher and report the concrete blocker.
 
 Before merging, refresh the PR's head, base, checks, and reviews, and confirm that required checks passed, applicable CI is green, required approvals are still valid, and blocking threads are resolved. When the base advanced and repository rules require an update, return to step 2. Merge through branch protection and merge queues as configured; bypass options such as `--admin` and weakened checks are off the table.
 
-Use the repository's documented merge method; prefer squash when allowed and nothing else is specified. Bind each merge to the **verified head** SHA (on GitHub, `gh pr merge --match-head-commit <sha>`). Use stack merge tooling only when it preserves this binding; otherwise merge through the host CLI and repair descendants with the stack tooling, giving each repaired head fresh checks before its merge. When the head changes, re-evaluate its checks first. With auto-merge or a queue, keep watching until the host reports the PR merged; enabling auto-merge is a request, not a merge. Stop the watcher (`unwatch_pull_request` in T3 Code) once the PR is merged or you hand back.
+Use the repository's documented merge method; prefer squash when allowed and nothing else is specified. Bind each merge to the **verified head** SHA (on GitHub, `gh pr merge --match-head-commit <sha>`). Use stack merge tooling only when it preserves this binding; otherwise merge through the host CLI and repair descendants with the stack tooling, giving each repaired head fresh checks before its merge. When the head changes, re-evaluate its checks first. With auto-merge or a queue, keep watching until the host reports the PR merged; enabling auto-merge is a request, not a merge. Stop the watcher (`unwatch_pull_request` in T3 Code) whenever the PR is merged or the run hands back, blocked runs included.
 
 Completion: the host reports every PR in the landing list merged, with its merge commit recorded.
 
 ## 4. Follow the deployment
 
-When the repository documents a deployment that runs after merge, follow it through to production unless the user opted out: find the run the last merge triggered, watch it to completion, and confirm the deployed version or SHA from the documented health check or status source. A deployment that waits on a manual promotion or approval is reported in that state. On failure, report the run and its failing step.
+When the repository documents a deployment that runs after merge, follow it through to production when the user asks for it or the repository's instructions prescribe verifying the deployment after a merge: find the run the last merge triggered, watch it to completion, and confirm the deployed version or SHA from the documented health check or status source. A deployment that waits on a manual promotion or approval is reported in that state. On failure, report the run and its failing step.
 
-Completion: the production state is confirmed and recorded, the deployment's blocking or failing state is reported, or no documented deployment exists.
+Completion: the production state is confirmed and recorded, the deployment's blocking or failing state is reported, or this run does not follow a deployment.
 
 ## 5. Stop the worktree's servers
 

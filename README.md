@@ -73,7 +73,7 @@ In Codex, use `$remove-low-value-tests` with the same instructions. Related code
 
 ## lgtm
 
-Land a PR, an ordered list of PRs, or a stack: rebase, validate, babysit checks, merge bound to the verified head commit, follow a documented deployment to production, and stop the landed worktrees' dev servers.
+Land a PR, an ordered list of PRs, or a stack: rebase, validate, babysit checks, merge bound to the verified head commit, follow a documented deployment to production when asked, and stop the landed worktrees' dev servers.
 
 ```sh
 npx skills add https://github.com/klaemo/skills --skill lgtm
@@ -87,12 +87,12 @@ It discovers checks, the merge method, stack tooling, deployment, and server rul
 /lgtm
 /lgtm #392
 /lgtm merge #392 and then #396
-/lgtm #392, skip the deployment, then tell the release thread
+/lgtm #392, follow the deployment to production, then tell the release thread
 ```
 
 ## lfg
 
-Take a request to an open PR: restate the intent, implement the smallest change on a new branch, run the checks, review it with [sol-review](#sol-review), prove it with [proof](#proof), and open the PR with the proof and the review ledger in its body.
+Take a request to an open PR: restate the intent, implement the smallest change on a feature branch, run the checks, review it with [sol-review](#sol-review), prove it with [proof](#proof), and open the PR with the proof and the review ledger in its body.
 
 ```sh
 npx skills add https://github.com/klaemo/skills --skill lfg
