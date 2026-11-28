@@ -6,52 +6,31 @@ disable-model-invocation: true
 
 # LGTM
 
-Run only when the user explicitly invokes `lgtm`. Invocation authorizes rebasing, pushing the PR branches, fixing failures within the PRs' scope, merging when repository requirements pass, watching a documented deployment, and stopping the associated dev or preview servers. Carry this through without asking for the same authorization again.
+Run only on explicit invocation. Invocation authorizes rebasing, pushing PR branches, fixing in-scope failures, merging once repo requirements pass, watching a documented deployment (when asked or repo-prescribed), and stopping owned dev/preview servers — carry this through without re-asking.
 
-## 1. Establish the target
+Read repo instructions (`AGENTS.md`, `CLAUDE.md`, linked guides) for checks, merge method, stack tooling, deployment, and server lifecycle.
 
-The target is the PRs supplied with the invocation, or the current branch's PR. An ordered list ("merge #392 and then #396") lands in that order, each merged before the next begins; ask when that order conflicts with the stack's dependencies.
+## 1. Establish the landing list
 
-Read applicable `AGENTS.md`, `CLAUDE.md`, and linked guidance for checks, merge practice, stack tooling, post-merge deployment, and starting and stopping servers. Inspect the working tree, each PR's head and base, the remote default branch, repository merge settings, and review requirements. Register each PR with the host application's thread-linking tool when one exists.
+Target the named PRs or the current branch's PR. Land an ordered list strictly in order (ask if it conflicts with stack dependencies).
 
-Discover stack dependencies through the stack tooling the user or repository documents (a stack skill or CLI, and its status command). Without such tooling, follow PR base branches down to the default branch. Invocation authorizes landing a target's unmerged ancestors, bottom first; PRs above the target stay unmerged. Ask when scope is ambiguous, including sibling branches, or when an in-scope PR is draft or has blocking reviews.
+Discover stack dependencies via documented stack tooling, or by following PR base branches down to the default branch. Land unmerged ancestors bottom-first; leave PRs above the target unmerged. Ask when scope is ambiguous (e.g. sibling branches), no PR fits, or an in-scope PR is draft or has blocking reviews. Record already-merged PRs for server cleanup; treat closed-without-merge PRs as blockers.
 
-Ask for the target when several fit or no PR exists. Preserve unrelated uncommitted changes; use an isolated checkout when needed. A PR already merged is recorded for server cleanup; one closed without merging is reported as a blocker.
+For stacked PRs, record each PR's fork point (parent branch head) before merging its parent.
 
-Completion: an ordered landing list in which every PR still to land is open and ready, with its base, its head SHA, and for a stacked PR its fork point (the parent branch's head) recorded, or a question to the user.
+## 2. Rebase, validate, and babysit through merge
 
-## 2. Rebase and validate
+Process one PR at a time:
 
-Take the landing list one PR at a time. Fetch the latest default branch from the PR's target repository, discovered rather than assumed to be `main` or `origin`, and rebase the PR branch onto it. In a stack, retarget the PR to the default branch and replay only its own layer from the recorded fork point: `git rebase --onto <default> <fork-point>`. A plain rebase after a squash merge replays the parent's commits. Stack tooling may retarget and repair descendants instead; verify that the PR's base is the default branch and its diff holds only its own layer. For an intentionally different base outside a stack, clarify the destination.
+1. Fetch the target repo's default branch (discover it rather than assuming `main`/`origin`) and rebase onto it. For a stacked PR whose parent was squash-merged, retarget to the default branch and replay only its own layer (`git rebase --onto <default> <fork-point>`), or use stack tooling and verify the base and diff contain only this layer. Clarify intentionally non-default bases outside a stack.
+2. Run required local validation and push with `--force-with-lease` against the recorded pre-rebase remote head (inspect concurrent changes if the lease fails).
+3. Wait for checks on the current remote head: in T3 Code, call `watch_pull_request` and end the turn (unwatch on merge or any handback, including blocked runs); elsewhere use bounded polling, or report pending checks and stop if neither is available.
+4. Fix in-scope CI failures, validate, push, and wait on the new head. Stop and report a concrete blocker if the same failure persists after two fixes, or if progress needs credentials, human review, or out-of-scope changes.
+5. Before merging, verify the live head, base, green checks, valid approvals, and resolved blocking threads (return to step 1 if the base advanced and repo rules require an update). Never bypass branch protection or merge queues (`--admin`, weakened checks).
+6. Merge with the repo's documented method (default: squash when allowed), **bound to the verified head SHA** (e.g. `gh pr merge --match-head-commit <sha>`). Use stack merge tooling, auto-merge, or a merge queue only if they preserve head-SHA binding, and keep watching until actually merged.
 
-Resolve conflicts using the PR's intended behavior and repository conventions; ask only when resolution requires a substantive product decision. Run the repository's required validation. Push with an explicit force-with-lease against the remote head recorded before rebasing; when the lease fails, inspect the concurrent changes before proceeding.
+## 3. Post-merge: deploy, cleanup, and report
 
-Completion: the remote head is the rebased, locally validated branch, and its SHA is recorded.
-
-## 3. Babysit through merge
-
-Wait on checks for the current remote head the way the harness provides. With a PR watcher (`watch_pull_request` in T3 Code), register the watch and end the turn; when it wakes you, re-read the live head and continue this step. Where the harness permits polling instead, use bounded waits and concise progress updates. With neither, report the pending checks and stop. Inspect failure logs, fix failures within scope, validate, and push. After every new commit or rebase, wait for checks on the new head; earlier green results do not carry over. Retry a transient infrastructure failure only when the evidence supports a retry. When the same failure persists after two remedies, or progress needs credentials, human review, or an out-of-scope change, stop the watcher and report the concrete blocker.
-
-Before merging, refresh the PR's head, base, checks, and reviews, and confirm that required checks passed, applicable CI is green, required approvals are still valid, and blocking threads are resolved. When the base advanced and repository rules require an update, return to step 2. Merge through branch protection and merge queues as configured; bypass options such as `--admin` and weakened checks are off the table.
-
-Use the repository's documented merge method; prefer squash when allowed and nothing else is specified. Bind each merge to the **verified head** SHA (on GitHub, `gh pr merge --match-head-commit <sha>`). Use stack merge tooling only when it preserves this binding; otherwise merge through the host CLI and repair descendants with the stack tooling, giving each repaired head fresh checks before its merge. When the head changes, re-evaluate its checks first. Use auto-merge or a merge queue only when it keeps this binding, so that a later push cannot merge unverified. Then keep watching until the host reports the PR merged; enabling auto-merge is a request, not a merge. Stop the watcher (`unwatch_pull_request` in T3 Code) whenever the PR is merged or the run hands back, blocked runs included.
-
-Completion: the host reports every PR in the landing list merged, with its merge commit recorded.
-
-## 4. Follow the deployment
-
-When the repository documents a deployment that runs after merge, follow it through to production when the user asks for it or the repository's instructions prescribe verifying the deployment after a merge: find the deployment run for each landed merge that changes what is deployed, watch it to completion, and confirm from the documented health check or status source that the deployed version or SHA includes those merges. A deployment that waits on a manual promotion or approval is reported in that state. On failure, report the run and its failing step.
-
-Completion: the production state is confirmed and recorded, the deployment's blocking or failing state is reported, or this run does not follow a deployment.
-
-## 5. Stop the worktree's servers
-
-After the last confirmed merge, sync stack metadata with the documented stack tooling, when there is one. Then stop dev and preview servers belonging to the landed PRs' worktrees or branches as the project's instructions describe, including any launcher wrapper's lifecycle. Select each process by a recorded process or session handle, or by a project-supported ownership check. On Linux, when discovery is needed, identify the listener for the known preview port with `ss -H -ltnp` and verify `/proc/<pid>/cwd` belongs to the intended worktree before terminating it.
-
-Ownership decides termination: stop a recorded process, or a listener whose live working directory is the intended worktree. Pattern matching on a name, command line, or branch string (`pkill -f`, `pgrep | kill`) establishes no ownership. Leave shared proxies and other worktrees' servers running. When ownership cannot be established, leave the process running and report it. Keep branches and worktrees unless their removal is separately authorized.
-
-Completion: each owned server has exited or its listener is gone, and every unresolved process is listed.
-
-## 6. Report
-
-List each PR link in merge order with its merge method, merge commit, and validation result. Report stack sync, the deployed state, and server cleanup. Distinguish a blocked PR, queued merge, pending deployment, or incomplete cleanup from a completed workflow. When the user named a thread to notify, send it this report (`t3_thread_send` in T3 Code, the harness's messaging tool elsewhere).
+- **Deployment** (only when asked or repo-prescribed): watch the deployment run for merges affecting deployed code and confirm via the documented health/status check; report manual promotion gates or failures.
+- **Stack sync & server cleanup**: sync stack metadata if documented, then stop dev/preview servers for the landed worktrees/branches per repo instructions. Terminate **only** by recorded handle or verified ownership (on Linux, e.g. `ss -H -ltnp` + `/proc/<pid>/cwd` matching the worktree) — never `pkill -f` or `pgrep | kill`. Leave shared proxies, other worktrees' servers, and unverified processes running (report unresolved ones). Keep branches and worktrees unless separately authorized.
+- **Report**: list each PR link in merge order (method, merge commit, validation), stack sync, deployed state, server cleanup, and any blocked/queued/pending/incomplete items. If the user named a thread to notify, send it this report (`t3_thread_send` in T3 Code, or the harness's messaging tool).
